@@ -107,12 +107,14 @@ export const addStory: methodHandler = async (req, res) => {
       published: published,
       thumbnail: '/imgs/story_thumbnail.jpg',
     }
+    const { insertedId } = await storyCollection.insertOne(story)
+    const newStory = await storyCollection.findOne({
+      _id: insertedId,
+    })
 
-    await storyCollection.insertOne(story)
-
-    if (published) {
-      res.revalidate(`/@${session.username}`)
-      res.revalidate(`/@${session.username}/${slug}`)
+    if (newStory?.published) {
+      res.revalidate(`/@${newStory.userData.username}`)
+      res.revalidate(`/@${newStory.userData.username}/${newStory.slug}`)
     }
 
     res.status(201).json({
@@ -222,8 +224,8 @@ export const updateStory: methodHandler = async (req, res) => {
     console.log('😇😇😇😇 data.value', data.value)
 
     if (data.value?.published) {
-      res.revalidate(`/@${session.username}`)
-      res.revalidate(`/@${session.username}/${data.value.slug}`)
+      res.revalidate(`/@${data.value.userData.username}`)
+      res.revalidate(`/@${data.value.userData.username}/${data.value.slug}`)
     }
 
     res.status(200).json({
