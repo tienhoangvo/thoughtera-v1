@@ -1,20 +1,20 @@
-import { Navbar as MantineNavbar } from "@mantine/core"
-import type { ReactNode } from "react"
-import useCurrentUser from "../../../../hooks/useData/useCurrentUser"
-import Brand from "../Brand"
-import MainLinks from "../MainLinks"
-import UserMenu from "../UserMenu"
+import { Navbar as MantineNavbar } from '@mantine/core'
+
+import useCurrentUser from '../../../../hooks/useData/useCurrentUser'
+import Brand from '../Brand'
+import MainLinks from '../MainLinks'
+import UserMenu from '../UserMenu'
 
 const Navbar = () => {
-  const {user} = useCurrentUser()
+  const { user } = useCurrentUser()
   console.log('😎', user)
   return (
     <MantineNavbar
       width={{
-        base: 300
+        base: 300,
       }}
       position={{
-        top: 0
+        top: 0,
       }}
       height={'100vh'}
       p="xs"
@@ -26,12 +26,11 @@ const Navbar = () => {
       <MantineNavbar.Section mt="md" grow>
         <MainLinks />
       </MantineNavbar.Section>
-      {
-        user && <MantineNavbar.Section>
+      {user && (
+        <MantineNavbar.Section>
           <UserMenu user={user} />
         </MantineNavbar.Section>
-      }
-
+      )}
     </MantineNavbar>
   )
 }

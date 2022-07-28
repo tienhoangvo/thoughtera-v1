@@ -1,8 +1,8 @@
-import { requestEmailVerificationToken } from "../../../lib/server/controllers/authController";
-import routeHandler from "../../../lib/server/routeHandler";
+import { requestEmailVerificationToken } from '../../../lib/server/controllers/authController'
+import routeHandler from '../../../lib/server/routeHandler'
 
 const requestEmailVerificationTokenHandler = routeHandler({
-  onPost: requestEmailVerificationToken
+  onPost: requestEmailVerificationToken,
 })
 
 export default requestEmailVerificationTokenHandler

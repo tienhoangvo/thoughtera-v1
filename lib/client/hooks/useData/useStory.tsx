@@ -1,5 +1,5 @@
-import useSWR from "swr"
-import { StoryDetailsType } from "../../../server/services/mongodb/queries"
+import useSWR from 'swr'
+import { StoryDetailsType } from '../../../server/services/mongodb/queries'
 
 type slug = string
 type id = string
@@ -10,9 +10,9 @@ type useStoryParams = {
 
 type StatusType = 'idle' | 'loading' | 'success' | 'failed'
 
-const useStory = ( { identifier } : useStoryParams) => {
+const useStory = ({ identifier }: useStoryParams) => {
   const { data, error, mutate } = useSWR(`/api/stories/${identifier}`)
-  const story = data ? data.story as StoryDetailsType : null
+  const story = data ? (data.story as StoryDetailsType) : null
 
   let status: StatusType = 'idle'
 
@@ -28,14 +28,13 @@ const useStory = ( { identifier } : useStoryParams) => {
     status = 'failed'
   }
 
-  
   console.log(data)
-  return ({
+  return {
     story,
     error,
     status,
-    mutate
-  })
+    mutate,
+  }
 }
 
 export default useStory

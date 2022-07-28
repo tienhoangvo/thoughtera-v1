@@ -1,14 +1,5 @@
-import useSWR, { Fetcher } from "swr"
-import UserType from "../../../server/collectionTypes/UserType"
-import { getCurrentUser } from "../../services/auth"
-
-const user = {
-  _id: 'ssssrsss',
-  name: 'Tien Vo',
-  username: 'tienhoangvo',
-  email: 'tienhoangvo.dev@gmail.com',
-  avatar: '/imgs/avatar.jpg'
-}
+import useSWR from 'swr'
+import UserType from '../../../server/collectionTypes/UserType'
 
 type CurrentUserStatus = 'loading' | 'success' | 'failed'
 
@@ -16,7 +7,7 @@ const useCurrentUser = () => {
   const { data, error, mutate } = useSWR('/api/users/me')
 
   let user: UserType | undefined
-  let status : CurrentUserStatus = 'loading'
+  let status: CurrentUserStatus = 'loading'
   if (data) {
     status = data.status
     user = data.user
@@ -24,7 +15,7 @@ const useCurrentUser = () => {
   return {
     user,
     status,
-    mutate
+    mutate,
   }
 }
 

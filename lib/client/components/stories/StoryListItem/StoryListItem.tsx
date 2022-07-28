@@ -1,16 +1,14 @@
-import { Box, Card, Group, Text, Title, useMantineTheme, Image, Stack, ThemeIcon, Badge, LoadingOverlay, Avatar, Divider } from "@mantine/core"
+import { Card, Divider } from '@mantine/core'
 
-import Link from "next/link"
+import { ReactNode } from 'react'
 
-import { ReactElement, ReactNode, useState } from "react"
+import { StoryListItemType } from '../../../../server/services/mongodb/queries'
 
-import { StoryListItemType } from "../../../../server/services/mongodb/queries"
-
-import StoryInfoSnippet from "../StoryInfoSnippet"
+import StoryInfoSnippet from '../StoryInfoSnippet'
 
 type StoryListItemProps = {
-  story: StoryListItemType,
-  renderHeader: (story: StoryListItemType) => ReactNode,
+  story: StoryListItemType
+  renderHeader: (story: StoryListItemType) => ReactNode
   loader?: ReactNode
 }
 

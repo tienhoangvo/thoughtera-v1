@@ -1,31 +1,31 @@
-import { Db, ObjectId } from "mongodb"
-import StoryType from "../collectionTypes/StoryType"
-import UserType from "../collectionTypes/UserType"
-import type { methodHandler } from "../routeHandler"
-import getCollection from "../services/mongodb/getCollection"
+import { Db, ObjectId } from 'mongodb'
+import StoryType from '../collectionTypes/StoryType'
+import UserType from '../collectionTypes/UserType'
+import type { methodHandler } from '../routeHandler'
+import getCollection from '../services/mongodb/getCollection'
 import slugify from 'slugify'
-import connectDB from "../services/mongodb/connectDB"
-import { listStoriesByPage } from "../services/mongodb/queries"
-import { STORY_LIMIT } from "../services/mongodb/constants"
-import { UserSession } from "../utils/auth"
+import connectDB from '../services/mongodb/connectDB'
+import { listStoriesByPage } from '../services/mongodb/queries'
+import { STORY_LIMIT } from '../services/mongodb/constants'
+import { UserSession } from '../utils/auth'
 
 type ListStoriesQuery = {
-  username?: string,
-  page?: number,
+  username?: string
+  page?: number
 }
 
-
 export const listStories: methodHandler = async (req, res) => {
-
   const query = req.query as ListStoriesQuery
   const PAGE = query.page ?? 1
 
-  let filter = query.username ? {
-    username: query.username,
-    published: true
-  } : {
-    published: true
-  }
+  let filter = query.username
+    ? {
+        username: query.username,
+        published: true,
+      }
+    : {
+        published: true,
+      }
 
   const stories = await listStoriesByPage({ page: PAGE, filter })
 
@@ -35,13 +35,13 @@ export const listStories: methodHandler = async (req, res) => {
     page: PAGE,
     limit: STORY_LIMIT,
     noResults: stories.length,
-    stories
+    stories,
   })
 }
 
 type ListUserStoriesQuery = {
-  published?: string,
-  page?: number,
+  published?: string
+  page?: number
 }
 
 export const listUserStories: methodHandler = async (req, res) => {
@@ -51,7 +51,7 @@ export const listUserStories: methodHandler = async (req, res) => {
 
   let filter = {
     username: session.username,
-    published: query.published === 'true'
+    published: query.published === 'true',
   }
   const stories = await listStoriesByPage({ page: PAGE, filter })
 
@@ -61,30 +61,43 @@ export const listUserStories: methodHandler = async (req, res) => {
     page: PAGE,
     limit: STORY_LIMIT,
     noResults: stories.length,
-    stories
+    stories,
   })
 }
 
 export const addStory: methodHandler = async (req, res) => {
-
-  const { session, title, content, excerpt, published }: { session: UserSession, title: string, content: string, excerpt: string, published: boolean } = req.body
+  const {
+    session,
+    title,
+    content,
+    excerpt,
+    published,
+  }: {
+    session: UserSession
+    title: string
+    content: string
+    excerpt: string
+    published: boolean
+  } = req.body
 
   const db = await connectDB()
   const storyCollection = getCollection(db)('stories')
 
   const createdAt = new Date()
 
-
-
   try {
-    const slug = slugify(title, { lower: true, trim: true, remove: /[*+~.()'"!:@]/g })
+    const slug = slugify(title, {
+      lower: true,
+      trim: true,
+      remove: /[*+~.()'"!:@?]/g,
+    })
     let story = {
       _id: new ObjectId(),
       userId: session._id,
       userData: {
         name: session.name,
         avatar: session.avatar,
-        username: session.username
+        username: session.username,
       },
       title,
       content,
@@ -92,31 +105,32 @@ export const addStory: methodHandler = async (req, res) => {
       slug,
       createdAt,
       published: published,
-      thumbnail: '/imgs/story_thumbnail.jpg'
+      thumbnail: '/imgs/story_thumbnail.jpg',
     }
 
     await storyCollection.insertOne(story)
 
     if (published) {
       res.revalidate(`/@${session.username}`)
+      res.revalidate(`/@${session.username}/${slug}`)
     }
 
     res.status(201).json({
       status: 'success',
-      story
+      story,
     })
-
   } catch (error: any) {
     if (error.code === 11000) {
-      error.message = `${Object.keys(error.keyValue)[0]}: ${Object.values(error.keyValue)[0]} already exists`
+      error.message = `${Object.keys(error.keyValue)[0]}: ${
+        Object.values(error.keyValue)[0]
+      } already exists`
     }
 
     res.status(400).json({
       status: 'failed',
-      message: error.message
+      message: error.message,
     })
   }
-
 }
 
 export const getStory: methodHandler = async (req, res) => {
@@ -126,40 +140,34 @@ export const getStory: methodHandler = async (req, res) => {
   let storyId: ObjectId
   let storySlug: string
 
-  let filter = {
-
-  }
+  let filter = {}
   try {
     storyId = new ObjectId(id)
 
     filter = {
-      _id: storyId
+      _id: storyId,
     }
   } catch (error) {
     storySlug = id
 
     filter = {
-      slug: storySlug
+      slug: storySlug,
     }
   }
 
   console.log(filter)
-
-
 
   const story = await storyCollection.findOne(filter)
 
   if (!story) {
     return res.status(404).json({
       status: 'failed',
-      messange: 'No story found'
+      messange: 'No story found',
     })
-
-    
   }
   res.status(200).json({
     status: 'success',
-    story
+    story,
   })
 }
 
@@ -167,7 +175,17 @@ export const updateStory: methodHandler = async (req, res) => {
   const { id } = req.query
   console.log(req.query)
 
-  const { session, ...storyUpdateData }: { session: UserSession, _id: string, title?: string, content?: string, excerpt?: string, published?: boolean } = req.body
+  const {
+    session,
+    ...storyUpdateData
+  }: {
+    session: UserSession
+    _id: string
+    title?: string
+    content?: string
+    excerpt?: string
+    published?: boolean
+  } = req.body
   try {
     const db = await connectDB()
     const storyCollection = getCollection(db)('stories')
@@ -175,36 +193,46 @@ export const updateStory: methodHandler = async (req, res) => {
     let updateObject: any = { updatedAt: new Date() }
 
     if (storyUpdateData.title) {
-      updateObject.slug = slugify(storyUpdateData.title, { lower: true, trim: true, remove: /[*+~.()'"!:@]/g })
+      updateObject.slug = slugify(storyUpdateData.title, {
+        lower: true,
+        trim: true,
+        remove: /[*+~.()'"!:@?]/g,
+      })
     }
 
     updateObject = { ...updateObject, ...storyUpdateData }
-
-
 
     const userId = session._id
     const _id = new ObjectId(id as string)
 
     console.log({ userId, _id })
-    const data = await storyCollection.findOneAndUpdate({
-      _id,
-      userId
-    }, {
-      $set: updateObject
-    }, {
-      returnDocument: "after"
-    })
+    const data = await storyCollection.findOneAndUpdate(
+      {
+        _id,
+        userId,
+      },
+      {
+        $set: updateObject,
+      },
+      {
+        returnDocument: 'after',
+      }
+    )
+
+    if (data.value?.published) {
+      res.revalidate(`/@${session.username}`)
+      res.revalidate(`/@${session.username}/${data.value.slug}`)
+    }
 
     res.status(200).json({
-      "status": "success",
-      story: data.value
+      status: 'success',
+      story: data.value,
     })
   } catch (error) {
     res.status(500).json({
-      error: error
+      error: error,
     })
   }
-
 }
 
 export const deleteStory: methodHandler = async (req, res) => {
@@ -218,22 +246,27 @@ export const deleteStory: methodHandler = async (req, res) => {
     const _id = new ObjectId(id as string)
     const data = await storyCollection.findOneAndDelete({
       _id,
-      userId
+      userId,
     })
 
     if (!data.value) {
       throw new Error('No story found')
     }
 
+    if (data.value.published) {
+      res.revalidate(`/@${session.username}`)
+      res.revalidate(`/@${session.username}/${data.value.slug}`)
+    }
+
     res.status(200).json({
-      "status": "success",
-      data
+      status: 'success',
+      data,
     })
   } catch (error: any) {
     console.error(error)
     res.status(400).json({
       status: 'failed',
-      error: error.message
+      error: error.message,
     })
   }
 

@@ -1,36 +1,37 @@
-import type { methodHandler } from "../routeHandler"
-import connectDB from "../services/mongodb/connectDB"
+import type { methodHandler } from '../routeHandler'
+import connectDB from '../services/mongodb/connectDB'
 import bcrypt from 'bcryptjs'
-import getCollection from "../services/mongodb/getCollection"
-import generateOTP from "../utils/generateOTP"
-import { Db, ObjectId } from "mongodb"
+import getCollection from '../services/mongodb/getCollection'
+import generateOTP from '../utils/generateOTP'
+import { ObjectId } from 'mongodb'
 import { serialize } from 'cookie'
-import UserType from "../collectionTypes/UserType"
-import { generateAccessToken, UserSession, verifyAuth } from "../utils/auth"
-import { ACCESS_TOKEN } from "../utils/constants"
+import { generateAccessToken, verifyAuth } from '../utils/auth'
+import { ACCESS_TOKEN } from '../utils/constants'
 
-export const protectAccess = (cb:methodHandler):methodHandler => async (req, res) =>{
-  const { accessToken } = req.cookies
+export const protectAccess =
+  (cb: methodHandler): methodHandler =>
+  async (req, res) => {
+    const { accessToken } = req.cookies
 
-  if (!accessToken) {
-    return res.status(401).json({
-      status: 'failed',
-      message: 'Log in to access this endpoint!'
-    })
+    if (!accessToken) {
+      return res.status(401).json({
+        status: 'failed',
+        message: 'Log in to access this endpoint!',
+      })
+    }
+
+    try {
+      const payload = await verifyAuth(accessToken)
+      req.body = { ...req.body, session: payload }
+      return cb(req, res)
+    } catch (error: any) {
+      return res.status(401).json({
+        status: 'failed',
+        message: error.message,
+        error: error,
+      })
+    }
   }
-
-  try {
-    const payload =  await verifyAuth(accessToken)
-    req.body = { ...req.body, session: payload}
-    return cb(req, res)
-  } catch (error: any) {
-    return res.status(401).json({
-      status: 'failed',
-      message: error.message,
-      error: error
-    })
-  }
-}
 
 export const signin: methodHandler = async (req, res) => {
   const db = await connectDB()
@@ -39,7 +40,7 @@ export const signin: methodHandler = async (req, res) => {
   const { username, password } = req.body
 
   const user = await userCollection.findOne({
-    username
+    username,
   })
 
   console.log(user)
@@ -47,7 +48,7 @@ export const signin: methodHandler = async (req, res) => {
   if (!user) {
     return res.status(401).json({
       status: 'failed',
-      message: `Username or password is incorrect!`
+      message: `Username or password is incorrect!`,
     })
   }
 
@@ -56,7 +57,7 @@ export const signin: methodHandler = async (req, res) => {
       status: 'failed',
       message: `You must verify your email address ${user.email} to log in`,
       userId: user._id,
-      userEmail: user.email
+      userEmail: user.email,
     })
   }
 
@@ -65,7 +66,7 @@ export const signin: methodHandler = async (req, res) => {
   if (!matched) {
     return res.status(401).json({
       status: 'failed',
-      message: `Email or password is incorrect!`
+      message: `Email or password is incorrect!`,
     })
   }
 
@@ -75,25 +76,30 @@ export const signin: methodHandler = async (req, res) => {
     username: user.username,
     email: user.email,
     isVerified: user.isVerified,
-    avatar: user.avatar
+    avatar: user.avatar,
   })
 
-  res.setHeader("Set-Cookie", serialize(ACCESS_TOKEN, accessToken, {
-    maxAge: 60 * 60 * 2,
-    path: '/'
-  }))
+  res.setHeader(
+    'Set-Cookie',
+    serialize(ACCESS_TOKEN, accessToken, {
+      maxAge: 60 * 60 * 2,
+      path: '/',
+    })
+  )
 
   res.status(200).json({
     status: 'success',
     user,
-    accessToken
+    accessToken,
   })
 }
 
 export const signup: methodHandler = async (req, res) => {
   const db = await connectDB()
   const userCollection = getCollection(db)('users')
-  const emailVerificationTokenCollection = getCollection(db)('emailVerificationTokens')
+  const emailVerificationTokenCollection = getCollection(db)(
+    'emailVerificationTokens'
+  )
 
   const { username, email, password, name } = req.body
 
@@ -105,7 +111,7 @@ export const signup: methodHandler = async (req, res) => {
     password: hashedPassword,
     isVerified: false,
     name,
-    avatar: '/imgs/avatar.jpg'
+    avatar: '/imgs/avatar.jpg',
   }
   try {
     const { insertedId } = await userCollection.insertOne(newUser)
@@ -117,7 +123,7 @@ export const signup: methodHandler = async (req, res) => {
     await emailVerificationTokenCollection.insertOne({
       token: hashedToken,
       userId: insertedId,
-      createdAt: new Date()
+      createdAt: new Date(),
     })
 
     res.status(201).json({
@@ -125,40 +131,46 @@ export const signup: methodHandler = async (req, res) => {
       OTP,
       user: {
         ...newUser,
-        _id: insertedId
-      }
+        _id: insertedId,
+      },
     })
   } catch (error: any) {
     console.log(error)
 
     if (error.code === 11000) {
-      error.message = `${Object.keys(error.keyValue)[0]}: ${Object.values(error.keyValue)[0]} already exists`
+      error.message = `${Object.keys(error.keyValue)[0]}: ${
+        Object.values(error.keyValue)[0]
+      } already exists`
     }
     res.status(400).json({
       status: 'failed',
       error: error,
-      message: error.message
+      message: error.message,
     })
   }
-
 }
 
-export const requestEmailVerificationToken: methodHandler = async (req, res) => {
+export const requestEmailVerificationToken: methodHandler = async (
+  req,
+  res
+) => {
   const { userId } = req.body
 
   const db = await connectDB()
   const userCollection = getCollection(db)('users')
 
-  const emailVerificationTokenCollection = getCollection(db)('emailVerificationTokens')
+  const emailVerificationTokenCollection = getCollection(db)(
+    'emailVerificationTokens'
+  )
 
   const user = await userCollection.findOne({
-    _id: new ObjectId(userId)
+    _id: new ObjectId(userId),
   })
 
   if (!user) {
     return res.status(404).json({
       status: 'failed',
-      message: `No user found with the given ID: ${userId}`
+      message: `No user found with the given ID: ${userId}`,
     })
   }
 
@@ -169,7 +181,8 @@ export const requestEmailVerificationToken: methodHandler = async (req, res) => 
   if (currentToken) {
     return res.status(400).json({
       status: 'failed',
-      message: 'You already have an active OTP generated, please open your email to use it or wait until it expires!'
+      message:
+        'You already have an active OTP generated, please open your email to use it or wait until it expires!',
     })
   }
 
@@ -180,31 +193,35 @@ export const requestEmailVerificationToken: methodHandler = async (req, res) => 
   await emailVerificationTokenCollection.insertOne({
     token: hashedToken,
     userId: user._id,
-    createdAt: new Date()
+    createdAt: new Date(),
   })
 
   res.status(201).json({
     status: 'success',
     message: `An OTP with 6 digits long has been sent to your email address ${user.email}. It will be expired after 3 minutes.`,
-    OTP
+    OTP,
   })
 }
 
 export const verifyEmailAddress: methodHandler = async (req, res) => {
   const db = await connectDB()
   const userCollection = getCollection(db)('users')
-  const emailVerificationTokenCollection = getCollection(db)('emailVerificationTokens')
+  const emailVerificationTokenCollection = getCollection(db)(
+    'emailVerificationTokens'
+  )
 
   const { userId, OTP } = req.body
 
-  const emailVerificationToken = await emailVerificationTokenCollection.findOne({
-    userId: new ObjectId(userId)
-  })
+  const emailVerificationToken = await emailVerificationTokenCollection.findOne(
+    {
+      userId: new ObjectId(userId),
+    }
+  )
 
   if (!emailVerificationToken) {
     return res.status(404).json({
       status: 'failed',
-      message: 'Your OTP has been expired!'
+      message: 'Your OTP has been expired!',
     })
   }
   const { token } = emailVerificationToken
@@ -214,84 +231,87 @@ export const verifyEmailAddress: methodHandler = async (req, res) => {
   if (!isMatched) {
     return res.status(400).json({
       status: 'failed',
-      message: 'Incorrect OTP'
+      message: 'Incorrect OTP',
     })
   }
 
-  await userCollection.findOneAndUpdate({
-    _id: new ObjectId(userId)
-  }, {
-    $set: {
-      isVerified: true
+  await userCollection.findOneAndUpdate(
+    {
+      _id: new ObjectId(userId),
+    },
+    {
+      $set: {
+        isVerified: true,
+      },
     }
-  })
+  )
 
   await emailVerificationTokenCollection.deleteOne({
-    _id: emailVerificationToken._id
+    _id: emailVerificationToken._id,
   })
 
   res.status(200).json({
     status: 'success',
-    message: 'Your email has been verified, you can now log in into the system to explore our resources!',
+    message:
+      'Your email has been verified, you can now log in into the system to explore our resources!',
     todos: [
       {
         name: 'login',
         url: '/login',
-        apiEndpoint: '/api/auth/login'
-      }
-    ]
+        apiEndpoint: '/api/auth/login',
+      },
+    ],
   })
-
 }
 
 export const changeEmailAddress: methodHandler = (req, res) => {
   res.status(200).json({
     status: 'success',
-    user: {}
+    user: {},
   })
 }
 
 export const changePassword: methodHandler = (req, res) => {
   res.status(200).json({
     status: 'success',
-    user: {}
+    user: {},
   })
 }
 
 export const forgotPassword: methodHandler = (req, res) => {
   res.status(200).json({
     status: 'success',
-    user: {}
+    user: {},
   })
 }
 
 export const resetPassword: methodHandler = (req, res) => {
   res.status(200).json({
     status: 'success',
-    user: {}
+    user: {},
   })
 }
 
-export const getCurrentUser: methodHandler =  (req, res) => {
- 
+export const getCurrentUser: methodHandler = (req, res) => {
   const { session } = req.body
 
   res.status(200).json({
     status: 'success',
-    user: session
+    user: session,
   })
 }
 
 export const signOut: methodHandler = (req, res) => {
-
-  res.setHeader('Set-Cookie', serialize('accessToken', '', {
-    maxAge: 0,
-    path: '/'
-  }))
+  res.setHeader(
+    'Set-Cookie',
+    serialize('accessToken', '', {
+      maxAge: 0,
+      path: '/',
+    })
+  )
 
   res.status(200).json({
     status: 'success',
-    message: 'You logged out!'
+    message: 'You logged out!',
   })
 }
-

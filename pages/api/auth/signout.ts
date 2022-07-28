@@ -1,8 +1,8 @@
-import { signOut } from "../../../lib/server/controllers/authController";
-import routeHandler from "../../../lib/server/routeHandler";
+import { signOut } from '../../../lib/server/controllers/authController'
+import routeHandler from '../../../lib/server/routeHandler'
 
 const signoutHandler = routeHandler({
-  onPost: signOut
+  onPost: signOut,
 })
 
 export default signoutHandler

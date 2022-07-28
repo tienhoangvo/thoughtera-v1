@@ -1,16 +1,16 @@
-import AuthorHeader from "../StoryListItem/AuthorHeader"
+import AuthorHeader from '../StoryListItem/AuthorHeader'
 import StoryListItem from '../StoryListItem'
-import type  { StoryListItemType } from "../../../../server/services/mongodb/queries"
+import type { StoryListItemType } from '../../../../server/services/mongodb/queries'
 
 type StoryListItemAuthorProps = {
-  story: StoryListItemType,
+  story: StoryListItemType
 }
 
 const StoryListItemAuthor = ({ story }: StoryListItemAuthorProps) => {
   return (
-    <StoryListItem 
+    <StoryListItem
       story={story}
-      renderHeader={story => <AuthorHeader userData={story.userData}/>}
+      renderHeader={(story) => <AuthorHeader userData={story.userData} />}
     />
   )
 }

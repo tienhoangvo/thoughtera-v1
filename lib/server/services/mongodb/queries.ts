@@ -1,20 +1,20 @@
-import connectDB from "./connectDB";
-import { STORY_LIMIT } from "./constants";
-import getCollection from "./getCollection";
+import connectDB from './connectDB'
+import { STORY_LIMIT } from './constants'
+import getCollection from './getCollection'
 
 export type StoryListItemType = {
-  _id: string,
-  title: string,
-  excerpt: string,
-  published: boolean,
-  userId: string,
+  _id: string
+  title: string
+  excerpt: string
+  published: boolean
+  userId: string
   userData: {
-    username: string,
-    name: string,
+    username: string
+    name: string
     avatar: string
-  },
-  slug: string,
-  createdAt: string,
+  }
+  slug: string
+  createdAt: string
   thumbnail: string
 }
 
@@ -25,13 +25,16 @@ export type StoryDetailsType = StoryListItemType & {
 }
 
 type ListStoriesQueryParams = {
-  page: number,
+  page: number
   filter?: {
     username?: string
-    published: boolean,
+    published: boolean
   }
 }
-export const listStoriesByPage = async ({ page, filter }: ListStoriesQueryParams) => {
+export const listStoriesByPage = async ({
+  page,
+  filter,
+}: ListStoriesQueryParams) => {
   const db = await connectDB()
   const storyCollection = getCollection(db)('stories')
   const PAGE = page
@@ -42,23 +45,25 @@ export const listStoriesByPage = async ({ page, filter }: ListStoriesQueryParams
     if (filter.username) {
       FILTER = {
         'userData.username': filter.username,
-        published: filter.published
+        published: filter.published,
       }
     } else {
       FILTER = {
-        published: filter.published
+        published: filter.published,
       }
     }
   }
 
-  const stories = await storyCollection.find(FILTER, {
-    skip: (PAGE - 1) * LIMIT,
-    limit: LIMIT,
-    sort: [['createdAt', -1]],
-    projection: {
-      content: 0
-    }
-  }).toArray()
+  const stories = await storyCollection
+    .find(FILTER, {
+      skip: (PAGE - 1) * LIMIT,
+      limit: LIMIT,
+      sort: [['createdAt', -1]],
+      projection: {
+        content: 0,
+      },
+    })
+    .toArray()
 
   return JSON.parse(JSON.stringify(stories)) as StoryListType
 }

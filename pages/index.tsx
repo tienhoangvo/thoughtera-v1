@@ -1,6 +1,6 @@
 import { Button, Center, Container, LoadingOverlay } from '@mantine/core'
 import { ArrowDownIcon } from '@modulz/radix-icons'
-import type {  GetStaticProps, NextPage } from 'next'
+import type { GetStaticProps, NextPage } from 'next'
 import { SWRConfig } from 'swr'
 import StoryList from '../lib/client/components/stories/StoryList/StoryList'
 import StoryListItemAuthor from '../lib/client/components/stories/StoryListItemAuthor'
@@ -9,47 +9,57 @@ import { ListStoryType } from '../lib/client/services/stories'
 import { listStoriesByPage } from '../lib/server/services/mongodb/queries'
 
 const Home = () => {
-
-  const {stories, nextPage, status} = useStories({})
+  const { stories, nextPage, status } = useStories({})
 
   const handleLoadMoreClick = () => {
     nextPage()
   }
 
-  if (status === 'loading') return (
-    <LoadingOverlay visible={true}/>
-  )
+  if (status === 'loading') return <LoadingOverlay visible={true} />
 
   return (
     <Container size="md">
-      <StoryList stories={stories} renderListItem={story =>(<StoryListItemAuthor story={story}/>)}/>
+      <StoryList
+        stories={stories}
+        renderListItem={(story) => <StoryListItemAuthor story={story} />}
+      />
       <Center>
-        <Button onClick={handleLoadMoreClick} mt="lg" leftIcon={<ArrowDownIcon/>} color="teal">Load more</Button>
+        <Button
+          onClick={handleLoadMoreClick}
+          mt="lg"
+          leftIcon={<ArrowDownIcon />}
+          color="teal"
+        >
+          Load more
+        </Button>
       </Center>
     </Container>
   )
 }
 
-const HomePage : NextPage = (props : { fallback?: ListStoryType}) => {
+const HomePage: NextPage = (props: { fallback?: ListStoryType }) => {
   return (
     <SWRConfig value={{ fallback: props.fallback }}>
-      <Home/>
+      <Home />
     </SWRConfig>
   )
 }
 
-export const getStaticProps : GetStaticProps = async (context) => {
-
-  const stories = await listStoriesByPage({page: 1, filter: { published: true }})
+export const getStaticProps: GetStaticProps = async (context) => {
+  const stories = await listStoriesByPage({
+    page: 1,
+    filter: { published: true },
+  })
 
   return {
     props: {
       fallback: {
-        '/api/stories?page=1': JSON.parse(JSON.stringify(stories))
-      }
-    }
+        '/api/stories?page=1': JSON.parse(JSON.stringify(stories)),
+      },
+    },
+    // revalidate new data 60 seconds after user request
+    revalidate: 60,
   }
 }
-
 
 export default HomePage

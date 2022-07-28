@@ -1,9 +1,8 @@
-import dynamic from "next/dynamic";
+import dynamic from 'next/dynamic'
 
 const RichTextEditor = dynamic(() => import('@mantine/rte'), {
   ssr: false,
-  loading: () => null
+  loading: () => null,
 })
-
 
 export default RichTextEditor

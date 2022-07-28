@@ -1,8 +1,8 @@
-import { verifyEmailAddress } from "../../../lib/server/controllers/authController";
-import routeHandler from "../../../lib/server/routeHandler";
+import { verifyEmailAddress } from '../../../lib/server/controllers/authController'
+import routeHandler from '../../../lib/server/routeHandler'
 
 const verifyEmailHandler = routeHandler({
-  onPost: verifyEmailAddress
+  onPost: verifyEmailAddress,
 })
 
 export default verifyEmailHandler

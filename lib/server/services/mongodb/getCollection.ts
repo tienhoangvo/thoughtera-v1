@@ -1,4 +1,4 @@
-import type { Db } from "mongodb"
+import type { Db } from 'mongodb'
 
 type CollectionName = 'users' | 'stories' | 'emailVerificationTokens'
 

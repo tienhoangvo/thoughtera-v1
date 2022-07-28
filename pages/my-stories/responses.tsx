@@ -1,5 +1,5 @@
-import { Title } from "@mantine/core"
-import Head from "next/head"
+import { Title } from '@mantine/core'
+import Head from 'next/head'
 
 const MyResponsesPage = () => {
   return (

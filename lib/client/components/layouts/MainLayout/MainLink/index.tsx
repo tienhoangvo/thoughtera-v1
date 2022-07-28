@@ -1,1 +1,1 @@
-export {default} from './MainLink'
+export { default } from './MainLink'
