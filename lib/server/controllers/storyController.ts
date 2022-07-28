@@ -29,7 +29,7 @@ export const listStories: methodHandler = async (req, res) => {
 
   const stories = await listStoriesByPage({ page: PAGE, filter })
 
-  res.setHeader('Cache-Control', 'max-age=0, s-maxage=86400')
+  // res.setHeader('Cache-Control', 'max-age=0, s-maxage=86400')
   res.status(200).json({
     status: 'success',
     page: PAGE,
@@ -55,7 +55,7 @@ export const listUserStories: methodHandler = async (req, res) => {
   }
   const stories = await listStoriesByPage({ page: PAGE, filter })
 
-  res.setHeader('Cache-Control', 'max-age=0, s-maxage=86400')
+  // res.setHeader('Cache-Control', 'max-age=0, s-maxage=86400')
   res.status(200).json({
     status: 'success',
     page: PAGE,
