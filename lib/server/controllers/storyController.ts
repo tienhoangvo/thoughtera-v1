@@ -219,6 +219,8 @@ export const updateStory: methodHandler = async (req, res) => {
       }
     )
 
+    console.log('😇😇😇😇 data.value', data.value)
+
     if (data.value?.published) {
       res.revalidate(`/@${session.username}`)
       res.revalidate(`/@${session.username}/${data.value.slug}`)

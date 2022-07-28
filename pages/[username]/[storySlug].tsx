@@ -20,7 +20,6 @@ import getCollection from '../../lib/server/services/mongodb/getCollection'
 const StoryPage: NextPage = (props: { story?: StoryType }) => {
   const router = useRouter()
   const story = props.story as StoryType
-
   if (router.isFallback) return <LoadingOverlay visible={!story} />
 
   return (
