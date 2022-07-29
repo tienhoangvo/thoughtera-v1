@@ -1,8 +1,6 @@
 import {
   Badge,
-  Box,
   Card,
-  Divider,
   Group,
   Image,
   Space,
@@ -19,10 +17,6 @@ type StoryArticleProps = {
 
 type StoryTagsProps = {
   tags: Array<string>
-}
-
-type StoryContentProps = {
-  content: string
 }
 
 const StoryTags = ({ tags }: StoryTagsProps) => {

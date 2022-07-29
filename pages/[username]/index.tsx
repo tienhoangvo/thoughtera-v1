@@ -1,19 +1,18 @@
 import { Container, LoadingOverlay } from '@mantine/core'
 import { useRouter } from 'next/router'
-import type { GetStaticPaths, GetStaticProps, NextPage } from 'next'
+import type { GetStaticPaths, GetStaticProps } from 'next'
 
 import StoryListItemAuthor from '../../lib/client/components/stories/StoryListItemAuthor'
 import StoryList from '../../lib/client/components/stories/StoryList/StoryList'
-import { StoryType } from '../../lib/client/services/stories'
 import connectDB from '../../lib/server/services/mongodb/connectDB'
 import getCollection from '../../lib/server/services/mongodb/getCollection'
-import {
+import { NextPageWithLayout } from '../_app'
+import MainLayout from '../../lib/client/components/layouts/MainLayout'
+
+import type {
   StoryListType,
   UserType,
 } from '../../lib/server/services/mongodb/queries'
-import { NextPageWithLayout } from '../_app'
-import AuthorStoriesLayout from '../../lib/client/components/layouts/AuthorStoriesLayout/AuthorStoriesLayout'
-import MainLayout from '../../lib/client/components/layouts/MainLayout'
 
 const AuthorStoriesPage: NextPageWithLayout = (props: {
   stories?: StoryListType

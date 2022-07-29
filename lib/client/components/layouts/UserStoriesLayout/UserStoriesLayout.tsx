@@ -1,7 +1,7 @@
 import { Box, Tabs } from '@mantine/core'
 import { useRouter } from 'next/router'
 import { FileDotted, UsersThree } from 'phosphor-react'
-import { ReactElement, useEffect, useState } from 'react'
+import { ReactElement } from 'react'
 import type { TabsValue } from '@mantine/core'
 type CurrentUserLayoutProps = {
   children?: ReactElement

@@ -1,9 +1,7 @@
-import { Divider, NavLink, ThemeIcon } from '@mantine/core'
+import { NavLink, ThemeIcon } from '@mantine/core'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { Article, House, PenNib, Person, SignIn } from 'phosphor-react'
-
-import MainLink from '../MainLink'
+import { Article, House, PenNib } from 'phosphor-react'
 
 const links = [
   {
