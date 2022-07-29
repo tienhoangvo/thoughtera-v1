@@ -10,6 +10,10 @@ export const middleware = async (req: NextRequest) => {
   // along with the user url as callbackUrl
 
   const accessToken = req.cookies.get(ACCESS_TOKEN)
+  console.log('🔃 Checking pathname in middleware')
+  console.log('pathname', url.pathname)
+  console.log('basePath', url.basePath)
+  console.log('href', url.href)
   if (!accessToken) {
     const signInUrl = new URL(`${url.origin}/sign-in`)
     signInUrl.searchParams.set('callbackUrl', url.pathname)
