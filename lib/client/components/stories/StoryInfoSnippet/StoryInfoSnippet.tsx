@@ -19,11 +19,13 @@ type StoryInfoSnippetProps = {
 const StoryInfoSnippet = ({ story }: StoryInfoSnippetProps) => {
   const storyHref = `@${story.userData.username}/${story.slug}`
   const theme = useMantineTheme()
+
+  const prefetch = story.published ? {} : { prefetch: false}
   return (
     <Box>
       <Group position="left" mb="md">
         {['#mental-health', '#self-help'].map((tag) => (
-          <Link key={tag} href={`/tags/${tag}`} passHref>
+          <Link key={tag} href={`/tags/${tag}`} passHref {...prefetch}>
             <Badge sx={{ cursor: 'pointer' }} component="a" color="indigo">
               {tag}
             </Badge>
@@ -37,7 +39,7 @@ const StoryInfoSnippet = ({ story }: StoryInfoSnippetProps) => {
           gap: theme.spacing.md,
         }}
       >
-        <Link href={storyHref} passHref>
+        <Link href={storyHref} passHref {...prefetch}>
           <a>
             <Image
               src={story.thumbnail}
@@ -57,7 +59,7 @@ const StoryInfoSnippet = ({ story }: StoryInfoSnippetProps) => {
             gap: theme.spacing.sm,
           }}
         >
-          <Link href={storyHref} passHref>
+          <Link href={storyHref} passHref {...prefetch}>
             <Box
               component="a"
               sx={{
@@ -94,7 +96,7 @@ const StoryInfoSnippet = ({ story }: StoryInfoSnippetProps) => {
         {story.excerpt}
       </Text>
       <Group position="left" mt="md">
-        <Link href={`/@${story.userData.username}/${story.slug}`} passHref>
+        <Link href={storyHref} passHref {...prefetch}>
           <Button
             component="a"
             color="teal"
