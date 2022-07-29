@@ -36,6 +36,7 @@ const SignInPage = () => {
     }).then((res) => {
       if (res.status === 'success') {
         mutate().then(() => {
+          console.log('router.query', router.query)
           router.push((router.query.callbackUrl as string) ?? '/')
         })
       }
