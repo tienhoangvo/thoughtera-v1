@@ -15,6 +15,7 @@ export const middleware = async (req: NextRequest) => {
   console.log('basePath', nextUrl.basePath)
   console.log('href', nextUrl.href)
 
+  console.log('accessToken', accessToken)
   if (!accessToken) {
     if (!nextUrl.pathname.startsWith('/sign-in')) {
       const signInUrl = new URL(`/sign-in`, req.url)
