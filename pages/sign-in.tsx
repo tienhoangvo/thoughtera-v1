@@ -63,12 +63,6 @@ const SignInPage = () => {
     setUserData(null)
   }
 
-  useEffect(() => {
-    if (currentUserStatus === 'success') {
-      router.push((router.query.callbackUrl as string) ?? '/')
-    }
-  }, [currentUserStatus])
-
   return (
     <Card sx={{ width: '400px', marginInline: 'auto' }} p="lg" withBorder>
       <LoadingOverlay visible={status === 'signing-up'} />
