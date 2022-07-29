@@ -88,7 +88,7 @@ const MainLayout = ({ children, user }: MainLayoutProps) => {
       }
     : {}
   return (
-    <AppShell navbar={<Navbar />} fixed {...asideProps} padding={0}>
+    <AppShell navbar={<Navbar />} fixed {...asideProps}>
       {children}
     </AppShell>
   )

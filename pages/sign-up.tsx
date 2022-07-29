@@ -64,6 +64,7 @@ const SignUpPage = () => {
           type="text"
           name="name"
           autoComplete="off"
+          variant="filled"
         />
         <TextInput
           required
@@ -73,6 +74,7 @@ const SignUpPage = () => {
           type="email"
           name="email"
           autoComplete="off"
+          variant="filled"
         />
         <TextInput
           required
@@ -82,6 +84,7 @@ const SignUpPage = () => {
           type="text"
           name="username"
           autoComplete="off"
+          variant="filled"
         />
         <TextInput
           required
@@ -91,6 +94,7 @@ const SignUpPage = () => {
           type="password"
           name="password"
           autoComplete="off"
+          variant="filled"
         />
         <Group position="apart">
           <Link href="/sign-in" passHref>

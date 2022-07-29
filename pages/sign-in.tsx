@@ -82,6 +82,7 @@ const SignInPage = () => {
           mb="md"
           name="username"
           type="text"
+          variant="filled"
         />
         <TextInput
           required
@@ -89,6 +90,7 @@ const SignInPage = () => {
           mb="md"
           name="password"
           type="password"
+          variant="filled"
         />
         <Group position="apart">
           <Link href="/sign-up" passHref>

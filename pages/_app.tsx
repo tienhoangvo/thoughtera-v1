@@ -12,7 +12,7 @@ import { NotificationsProvider } from '@mantine/notifications'
 import { SWRConfig } from 'swr'
 import { ModalsProvider } from '@mantine/modals'
 import fetcher from '../lib/client/services/fetcher'
-import RouterTransition from '../lib/client/components/loaders/RouterTransition'
+// import RouterTransition from '../lib/client/components/loaders/RouterTransition'
 
 export type NextPageWithLayout = NextPage & {
   getLayout: (page: ReactElement) => ReactElement
@@ -61,7 +61,7 @@ function MyApp({ Component, pageProps }: MyAppProps) {
             },
           }}
         >
-          <RouterTransition />
+          {/* <RouterTransition /> */}
           <NotificationsProvider>
             <ModalsProvider>
               <SWRConfig
