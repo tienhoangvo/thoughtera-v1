@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Card,
   Group,
@@ -9,10 +8,8 @@ import {
 } from '@mantine/core'
 import { showNotification } from '@mantine/notifications'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
-import { FormEvent, useEffect, useState } from 'react'
+import { FormEvent, useState } from 'react'
 import VerifyEmailModal from '../lib/client/components/modals/VerifyEmailModal'
-import useCurrentUser from '../lib/client/hooks/useData/useCurrentUser'
 import { signIn } from '../lib/client/services/auth'
 
 type UserData = {

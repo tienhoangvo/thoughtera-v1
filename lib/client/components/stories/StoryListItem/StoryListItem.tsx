@@ -1,4 +1,4 @@
-import { Card, Divider } from '@mantine/core'
+import { Card, CardSection, Divider } from '@mantine/core'
 
 import { ReactNode } from 'react'
 
@@ -15,10 +15,20 @@ type StoryListItemProps = {
 const StoryListItem = ({ story, renderHeader, loader }: StoryListItemProps) => {
   const header = renderHeader(story)
   return (
-    <Card withBorder>
+    <Card
+      sx={(theme) => ({
+        backgroundColor:
+          theme.colorScheme === 'light'
+            ? theme.colors.gray['0']
+            : theme.colors.dark[6],
+      })}
+    >
       {loader && loader}
       {header}
-      <Divider my="lg" />
+      <CardSection>
+        <Divider my="lg" />
+      </CardSection>
+
       <StoryInfoSnippet story={story} />
     </Card>
   )

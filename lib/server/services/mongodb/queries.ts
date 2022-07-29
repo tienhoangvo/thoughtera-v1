@@ -1,3 +1,4 @@
+import type { UserSession } from '../../utils/auth'
 import connectDB from './connectDB'
 import { STORY_LIMIT } from './constants'
 import getCollection from './getCollection'
@@ -22,6 +23,15 @@ export type StoryListType = Array<StoryListItemType>
 
 export type StoryDetailsType = StoryListItemType & {
   content: string
+}
+
+export type UserType = {
+  _id: string
+  name: string
+  email: string
+  isVerified: boolean
+  avatar: string
+  username: string
 }
 
 type ListStoriesQueryParams = {

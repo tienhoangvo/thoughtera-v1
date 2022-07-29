@@ -7,9 +7,17 @@ import StoryList from '../../lib/client/components/stories/StoryList/StoryList'
 import { StoryType } from '../../lib/client/services/stories'
 import connectDB from '../../lib/server/services/mongodb/connectDB'
 import getCollection from '../../lib/server/services/mongodb/getCollection'
-import { StoryListType } from '../../lib/server/services/mongodb/queries'
+import {
+  StoryListType,
+  UserType,
+} from '../../lib/server/services/mongodb/queries'
+import { NextPageWithLayout } from '../_app'
+import AuthorStoriesLayout from '../../lib/client/components/layouts/AuthorStoriesLayout/AuthorStoriesLayout'
+import MainLayout from '../../lib/client/components/layouts/MainLayout'
 
-const UserStoriesPage: NextPage = (props: { stories?: StoryListType }) => {
+const AuthorStoriesPage: NextPageWithLayout = (props: {
+  stories?: StoryListType
+}) => {
   const router = useRouter()
   const stories = props.stories || []
 
@@ -25,6 +33,10 @@ const UserStoriesPage: NextPage = (props: { stories?: StoryListType }) => {
       />
     </Container>
   )
+}
+
+AuthorStoriesPage.getLayout = (page) => {
+  return <MainLayout user={page.props.user as UserType}>{page}</MainLayout>
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
@@ -58,7 +70,8 @@ export const getStaticProps: GetStaticProps = async (context) => {
 
   return {
     props: {
-      stories: JSON.parse(JSON.stringify(stories)) as StoryType,
+      stories: JSON.parse(JSON.stringify(stories)) as StoryListType,
+      user: JSON.parse(JSON.stringify(user)) as UserType,
     },
   }
 }
@@ -96,4 +109,4 @@ export const getStaticPaths: GetStaticPaths = async (context) => {
   }
 }
 
-export default UserStoriesPage
+export default AuthorStoriesPage

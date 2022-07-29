@@ -1,87 +1,53 @@
-import {
-  Avatar,
-  Box,
-  Container,
-  Group,
-  LoadingOverlay,
-  Text,
-  Title,
-  TypographyStylesProvider,
-  UnstyledButton,
-} from '@mantine/core'
+import { Container, LoadingOverlay } from '@mantine/core'
+import { ObjectId } from 'mongodb'
 import type { GetStaticPaths, GetStaticProps, NextPage } from 'next'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
+import MainLayout from '../../lib/client/components/layouts/MainLayout'
+import StoryArticle from '../../lib/client/components/stories/StoryArticle'
 
-import { StoryType } from '../../lib/client/services/stories'
 import connectDB from '../../lib/server/services/mongodb/connectDB'
 import getCollection from '../../lib/server/services/mongodb/getCollection'
+import { StoryDetailsType } from '../../lib/server/services/mongodb/queries'
+import { NextPageWithLayout } from '../_app'
 
-const StoryPage: NextPage = (props: { story?: StoryType }) => {
+const StoryPage: NextPageWithLayout = (props: { story?: StoryDetailsType }) => {
   const router = useRouter()
-  const story = props.story as StoryType
-  if (router.isFallback) return <LoadingOverlay visible={!story} />
+
+  if (router.isFallback || !props.story)
+    return <LoadingOverlay visible={true} />
 
   return (
-    <Container size="sm">
-      <Group>
-        <Box>
-          <Title order={1}>{story?.title}</Title>
-        </Box>
-      </Group>
-      <Link href={`/@${story?.userData.username}`} passHref>
-        <UnstyledButton
-          component="a"
-          sx={(theme) => ({
-            display: 'inline-block',
-            padding: theme.spacing.xs,
-            borderRadius: theme.radius.sm,
-            color:
-              theme.colorScheme === 'dark' ? theme.colors.dark[0] : theme.black,
-            ':hover': {
-              backgroundColor:
-                theme.colorScheme === 'dark'
-                  ? theme.colors.dark[6]
-                  : theme.colors.gray[0],
-            },
-          })}
-        >
-          <Group>
-            <Avatar
-              src={story?.userData.avatar}
-              alt={story?.userData.name}
-              radius="xl"
-            />
-            <Box sx={{ flex: 1 }}>
-              <Text>{story?.userData.name}</Text>
-              <Text color="dimmed" size="xs">
-                @{story?.userData.username}
-              </Text>
-            </Box>
-          </Group>
-        </UnstyledButton>
-      </Link>
-
-      <TypographyStylesProvider mt="lg">
-        {story && <div dangerouslySetInnerHTML={{ __html: story.content }} />}
-      </TypographyStylesProvider>
+    <Container size="md">
+      <StoryArticle story={props.story} />
     </Container>
   )
+}
+
+StoryPage.getLayout = (page) => {
+  return <MainLayout user={page.props.user}>{page}</MainLayout>
 }
 
 export const getStaticProps: GetStaticProps = async (context) => {
   const db = await connectDB()
 
   const storyCollection = getCollection(db)('stories')
-
+  const userCollection = getCollection(db)('users')
   const story = await storyCollection.findOne({
     slug: context.params?.storySlug,
     published: true,
   })
 
-  console.log('getStaticProps context', context)
-
   if (!story) {
+    return {
+      notFound: true,
+    }
+  }
+
+  const user = await userCollection.findOne({
+    _id: new ObjectId(story.userId),
+  })
+
+  if (!user) {
     return {
       notFound: true,
     }
@@ -90,6 +56,7 @@ export const getStaticProps: GetStaticProps = async (context) => {
   return {
     props: {
       story: JSON.parse(JSON.stringify(story)),
+      user: JSON.parse(JSON.stringify(user)),
     },
   }
 }
@@ -97,7 +64,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
 export const getStaticPaths: GetStaticPaths = async (context) => {
   const db = await connectDB()
   const storyCollection = getCollection(db)('stories')
-
   const stories = await storyCollection
     .find(
       {

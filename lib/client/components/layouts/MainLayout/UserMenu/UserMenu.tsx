@@ -1,9 +1,7 @@
 import { Avatar, Box, Group, Menu, Text, UnstyledButton } from '@mantine/core'
-import { useRouter } from 'next/router'
 import { SignOut } from 'phosphor-react'
 
 import UserType from '../../../../../server/collectionTypes/UserType'
-import useCurrentUser from '../../../../hooks/useData/useCurrentUser'
 import { signout } from '../../../../services/auth'
 
 type UserProps = {
@@ -19,8 +17,8 @@ const UserMenu = ({ user }: UserProps) => {
   }
 
   return (
-    <Menu
-      control={
+    <Menu withArrow>
+      <Menu.Target>
         <UnstyledButton
           sx={(theme) => ({
             display: 'block',
@@ -48,14 +46,12 @@ const UserMenu = ({ user }: UserProps) => {
             </Box>
           </Group>
         </UnstyledButton>
-      }
-      sx={{ width: '100%' }}
-      placement="start"
-      withArrow
-    >
-      <Menu.Item icon={<SignOut />} onClick={handleSignoutClick}>
-        Sign out
-      </Menu.Item>
+      </Menu.Target>
+      <Menu.Dropdown>
+        <Menu.Item icon={<SignOut />} onClick={handleSignoutClick}>
+          Sign out
+        </Menu.Item>
+      </Menu.Dropdown>
     </Menu>
   )
 }

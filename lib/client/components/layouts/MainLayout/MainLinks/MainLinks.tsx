@@ -1,81 +1,59 @@
-import { Divider } from '@mantine/core'
+import { Divider, NavLink, ThemeIcon } from '@mantine/core'
+import Link from 'next/link'
+import { useRouter } from 'next/router'
 import { Article, House, PenNib, Person, SignIn } from 'phosphor-react'
 
 import MainLink from '../MainLink'
 
-const links = {
-  public: [
-    {
-      icon: <House />,
-      color: 'blue',
-      label: 'Home',
-      href: '/',
-    },
-  ],
-  private: [
-    {
-      icon: <Article />,
-      color: 'orange',
-      label: 'Your stories',
-      href: '/my-stories',
-    },
-    {
-      icon: <PenNib />,
-      color: 'grape',
-      label: 'Write',
-      href: '/new-story',
-    },
-  ],
-  auth: [
-    {
-      icon: <Person />,
-      color: 'teal',
-      label: 'Sign in',
-      href: '/sign-in',
-    },
-    {
-      icon: <SignIn />,
-      color: 'violet',
-      label: 'Sign up',
-      href: '/sign-up',
-    },
-  ],
-}
+const links = [
+  {
+    icon: <House />,
+    color: 'blue',
+    label: 'Home',
+    href: '/',
+  },
+  {
+    icon: <Article />,
+    color: 'orange',
+    label: 'Your stories',
+    href: '/my-stories',
+  },
+  {
+    icon: <PenNib />,
+    color: 'grape',
+    label: 'Write',
+    href: '/new-story',
+  },
+]
 const MainLinks = () => {
-  const privateLinks = links.private.map((link) => (
-    <MainLink
-      key={link.label}
-      icon={link.icon}
-      color={link.color}
-      label={link.label}
-      href={link.href}
-    />
-  ))
+  const router = useRouter()
+  const { pathname } = router
+  const getActiveStatus = (href: string) => {
+    let selected = false
 
-  const publicLinks = links.public.map((link) => (
-    <MainLink
-      key={link.label}
-      icon={link.icon}
-      color={link.color}
-      label={link.label}
-      href={link.href}
-    />
-  ))
+    if (pathname === '/') {
+      selected = href === '/'
+    }
 
-  const authLinks = links.auth.map((link) => (
-    <MainLink
-      key={link.label}
-      icon={link.icon}
-      color={link.color}
-      label={link.label}
-      href={link.href}
-    />
-  ))
+    if (href !== '/') {
+      console.log(href, pathname)
+      selected = pathname.startsWith(href)
+    }
+    return selected
+  }
+
   return (
     <div>
-      {publicLinks}
-      <Divider size="sm" my="lg" />
-      {privateLinks}
+      {links.map((link) => (
+        <Link href={link.href} passHref key={link.href}>
+          <NavLink
+            component="a"
+            active={getActiveStatus(link.href)}
+            label={link.label}
+            icon={<ThemeIcon variant="light">{link.icon}</ThemeIcon>}
+          />
+        </Link>
+      ))}
     </div>
   )
 }

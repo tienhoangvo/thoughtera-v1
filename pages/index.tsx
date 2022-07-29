@@ -1,6 +1,6 @@
 import { Button, Center, Container, LoadingOverlay } from '@mantine/core'
-import { ArrowDownIcon } from '@modulz/radix-icons'
 import type { GetStaticProps, NextPage } from 'next'
+import { ArrowDown } from 'phosphor-react'
 import { SWRConfig } from 'swr'
 import StoryList from '../lib/client/components/stories/StoryList/StoryList'
 import StoryListItemAuthor from '../lib/client/components/stories/StoryListItemAuthor'
@@ -27,7 +27,7 @@ const Home = () => {
         <Button
           onClick={handleLoadMoreClick}
           mt="lg"
-          leftIcon={<ArrowDownIcon />}
+          leftIcon={<ArrowDown />}
           color="teal"
         >
           Load more

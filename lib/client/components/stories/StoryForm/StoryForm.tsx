@@ -2,12 +2,12 @@ import {
   Stack,
   Button,
   Group,
-  InputWrapper,
   LoadingOverlay,
   Switch,
   Textarea,
   TextInput,
   Card,
+  Input,
 } from '@mantine/core'
 import { useRouter } from 'next/router'
 import { ArrowLeft, PaperPlaneRight } from 'phosphor-react'
@@ -105,7 +105,15 @@ const StoryForm = ({ story, onSave }: StoryFormProps) => {
   }
 
   return (
-    <Card withBorder>
+    <Card
+      p={50}
+      sx={(theme) => ({
+        backgroundColor:
+          theme.colorScheme === 'light'
+            ? theme.colors.gray['0']
+            : theme.colors.dark[6],
+      })}
+    >
       <LoadingOverlay visible={saving} />
       <Stack spacing="lg">
         <Group position="apart">
@@ -136,7 +144,7 @@ const StoryForm = ({ story, onSave }: StoryFormProps) => {
           mb="lg"
           autoFocus
         />
-        <InputWrapper
+        <Input.Wrapper
           size="md"
           label="Public"
           description="Publish your story so that people can see it or keep it as a draft now."
@@ -149,7 +157,7 @@ const StoryForm = ({ story, onSave }: StoryFormProps) => {
             checked={published}
             onChange={handlePublicSwitchChange}
           />
-        </InputWrapper>
+        </Input.Wrapper>
         <Textarea
           label="Excerpt"
           variant="filled"
@@ -162,13 +170,17 @@ const StoryForm = ({ story, onSave }: StoryFormProps) => {
           autosize
           maxRows={6}
         />
-        <InputWrapper label="Content" size="md">
+        <Input.Wrapper label="Content" size="md">
           <RichTextEditor
             value={content}
             onChange={handleContentChange}
-            sx={{ minHeight: '500px' }}
+            sx={(theme) => ({
+              minHeight: '500px',
+              backgroundColor: theme.colors.gray[1],
+              border: 'none',
+            })}
           />
-        </InputWrapper>
+        </Input.Wrapper>
       </Stack>
     </Card>
   )

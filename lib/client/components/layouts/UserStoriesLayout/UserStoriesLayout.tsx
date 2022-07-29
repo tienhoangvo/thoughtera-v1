@@ -2,7 +2,7 @@ import { Box, Tabs } from '@mantine/core'
 import { useRouter } from 'next/router'
 import { FileDotted, UsersThree } from 'phosphor-react'
 import { ReactElement, useEffect, useState } from 'react'
-
+import type { TabsValue } from '@mantine/core'
 type CurrentUserLayoutProps = {
   children?: ReactElement
 }
@@ -21,29 +21,22 @@ const tabs = [
 ]
 
 const UserStoriesLayout = ({ children }: CurrentUserLayoutProps) => {
-  const [active, setActive] = useState(0)
   const router = useRouter()
-
-  const pathname = router.pathname
-
-  useEffect(() => {
-    setActive(tabs.findIndex((tab) => tab.href === pathname))
-  }, [pathname])
-
+  const activeTab = router.pathname
+  const handleTabChange = (value: TabsValue) => {
+    router.push(value ?? '/my-stories')
+  }
   return (
     <Box>
-      <Tabs
-        active={active}
-        onTabChange={(_, key: string) => {
-          router.push(key)
-        }}
-        mb="xs"
-      >
-        {tabs.map((tab) => (
-          <Tabs.Tab key={tab.label} tabKey={tab.href} {...tab} />
-        ))}
+      <Tabs value={activeTab} onTabChange={handleTabChange} mb="xs">
+        <Tabs.List>
+          {tabs.map((tab) => (
+            <Tabs.Tab key={tab.label} value={tab.href} {...tab}>
+              {tab.label}
+            </Tabs.Tab>
+          ))}
+        </Tabs.List>
       </Tabs>
-
       {children}
     </Box>
   )
