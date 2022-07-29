@@ -20,10 +20,8 @@ type UserData = {
   userEmail: string
 } | null
 const SignInPage = () => {
-  const router = useRouter()
   const [status, setStatus] = useState('idle')
   const [userData, setUserData] = useState<UserData>(null)
-  const { mutate, user, status: currentUserStatus } = useCurrentUser()
   const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
@@ -35,12 +33,9 @@ const SignInPage = () => {
       password: password as string,
     }).then((res) => {
       if (res.status === 'success') {
-        mutate().then(() => {
-          const callbackUrl = '/new-story'
-          console.log('router.query', router.query)
-          console.log('router.query.callbackUrl', (router.query.callbackUrl as string) ?? '/')
-          router.push(callbackUrl)
-        })
+        if (typeof window !== 'undefined') {
+          window.location.reload()
+        }
       }
 
       if (res.status === 'failed') {
