@@ -15,6 +15,7 @@ const NewStoryPage = () => {
             content: submitData.content as string,
             excerpt: submitData.excerpt as string,
             published: submitData.published as boolean,
+            tags: submitData.tags as Array<string>,
           }).then((data) => {
             if (finishSaving) {
               finishSaving()

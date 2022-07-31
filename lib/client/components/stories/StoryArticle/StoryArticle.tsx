@@ -44,7 +44,7 @@ const StoryArticle = ({ story }: StoryArticleProps) => {
             : theme.colors.dark[6],
       })}
     >
-      <StoryTags tags={tags} />
+      <StoryTags tags={story.tags} />
       <Text
         component="h1"
         sx={{ fontSize: '30px', margin: 0, lineHeight: 1.2 }}

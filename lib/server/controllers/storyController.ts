@@ -8,6 +8,7 @@ import connectDB from '../services/mongodb/connectDB'
 import { listStoriesByPage } from '../services/mongodb/queries'
 import { STORY_LIMIT } from '../services/mongodb/constants'
 import { UserSession } from '../utils/auth'
+import { nanoid } from 'nanoid'
 
 type ListStoriesQuery = {
   username?: string
@@ -72,12 +73,14 @@ export const addStory: methodHandler = async (req, res) => {
     content,
     excerpt,
     published,
+    tags,
   }: {
     session: UserSession
     title: string
     content: string
     excerpt: string
     published: boolean
+    tags: Array<string>
   } = req.body
 
   const db = await connectDB()
@@ -86,11 +89,13 @@ export const addStory: methodHandler = async (req, res) => {
   const createdAt = new Date()
 
   try {
-    const slug = slugify(title, {
-      lower: true,
-      trim: true,
-      remove: /[*+~.()'"!:@?]/g,
-    })
+    const slug =
+      slugify(title, {
+        lower: true,
+        trim: true,
+        remove: /[*+~.()'"!:@?]/g,
+      }) + nanoid(10)
+
     let story = {
       _id: new ObjectId(),
       userId: session._id,
@@ -106,6 +111,7 @@ export const addStory: methodHandler = async (req, res) => {
       createdAt,
       published: published,
       thumbnail: '/imgs/story_thumbnail.jpg',
+      tags,
     }
     const { insertedId } = await storyCollection.insertOne(story)
     const newStory = await storyCollection.findOne({
@@ -157,8 +163,6 @@ export const getStory: methodHandler = async (req, res) => {
     }
   }
 
-  console.log(filter)
-
   const story = await storyCollection.findOne(filter)
 
   if (!story) {
@@ -195,11 +199,12 @@ export const updateStory: methodHandler = async (req, res) => {
     let updateObject: any = { updatedAt: new Date() }
 
     if (storyUpdateData.title) {
-      updateObject.slug = slugify(storyUpdateData.title, {
-        lower: true,
-        trim: true,
-        remove: /[*+~.()'"!:@?]/g,
-      })
+      updateObject.slug =
+        slugify(storyUpdateData.title, {
+          lower: true,
+          trim: true,
+          remove: /[*+~.()'"!:@?]/g,
+        }) + nanoid(10)
     }
 
     updateObject = { ...updateObject, ...storyUpdateData }
@@ -220,8 +225,6 @@ export const updateStory: methodHandler = async (req, res) => {
         returnDocument: 'after',
       }
     )
-
-    console.log('😇😇😇😇 data.value', data.value)
 
     if (data.value?.published) {
       res.revalidate(`/@${data.value.userData.username}`)

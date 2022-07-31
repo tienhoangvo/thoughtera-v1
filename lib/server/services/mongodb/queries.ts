@@ -17,6 +17,7 @@ export type StoryListItemType = {
   slug: string
   createdAt: string
   thumbnail: string
+  tags: Array<string>
 }
 
 export type StoryListType = Array<StoryListItemType>

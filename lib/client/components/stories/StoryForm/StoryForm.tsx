@@ -8,18 +8,22 @@ import {
   TextInput,
   Card,
   Input,
+  MultiSelect,
+  Badge,
 } from '@mantine/core'
 import { useRouter } from 'next/router'
 import { ArrowLeft, PaperPlaneRight } from 'phosphor-react'
 import { ChangeEvent, useRef, useState } from 'react'
 import type { StoryDetailsType } from '../../../../server/services/mongodb/queries'
 import RichTextEditor from '../RichTextEditor'
+import tagsData from './tagsData'
 
 export type StorySubmitDataType = {
   title?: string
   excerpt?: string
   content?: string
   published?: boolean
+  tags?: Array<string>
 }
 
 type StoryFormProps = {
@@ -33,7 +37,7 @@ type StoryFormProps = {
 
 const StoryForm = ({ story, onSave }: StoryFormProps) => {
   const getInitialValue = (
-    field: 'content' | 'title' | 'excerpt' | 'published'
+    field: 'content' | 'title' | 'excerpt' | 'published' | 'tags'
   ) => {
     if (story) {
       return story[field]
@@ -43,6 +47,8 @@ const StoryForm = ({ story, onSave }: StoryFormProps) => {
 
     if (field === 'content') return '<p><br></p>'
 
+    if (field === 'tags') return [tagsData.slice(0, 2)]
+
     return ''
   }
   const [content, setContent] = useState(getInitialValue('content') as string)
@@ -51,13 +57,16 @@ const StoryForm = ({ story, onSave }: StoryFormProps) => {
   const [published, setPublished] = useState(
     getInitialValue('published') as boolean
   )
+  const [tags, setTags] = useState(getInitialValue('tags') as Array<string>)
+
   const [saving, setSaving] = useState(false)
 
   const storySubmitDataRef = useRef<StorySubmitDataType>({})
   const disabled =
     title.trim().length === 0 ||
     excerpt.trim().length === 0 ||
-    content.trim() === '<p><br></p>'
+    content.trim() === '<p><br></p>' ||
+    tags.length === 0
   const router = useRouter()
   const handleContentChange = (value: string) => {
     setContent(value)
@@ -76,6 +85,12 @@ const StoryForm = ({ story, onSave }: StoryFormProps) => {
   const handlePublicSwitchChange = () => {
     setPublished(!published)
     storySubmitDataRef.current.published = !published
+  }
+
+  const handleTagsChange = (value: [string]) => {
+    setTags(value)
+    console.log('value tags', value)
+    storySubmitDataRef.current.tags = value
   }
 
   const handelBackClick = () => {
@@ -158,6 +173,18 @@ const StoryForm = ({ story, onSave }: StoryFormProps) => {
             onChange={handlePublicSwitchChange}
           />
         </Input.Wrapper>
+        <MultiSelect
+          data={tagsData}
+          variant="filled"
+          size="md"
+          mb="md"
+          label="Tags"
+          placeholder="Pick all that you like"
+          value={tags}
+          onChange={handleTagsChange}
+          clearButtonLabel="Clear selection"
+          clearable
+        />
         <Textarea
           label="Excerpt"
           variant="filled"

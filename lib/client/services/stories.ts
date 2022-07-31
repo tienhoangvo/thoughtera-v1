@@ -6,6 +6,7 @@ type createStoryProps = {
   content: string
   excerpt: string
   published: boolean
+  tags: Array<string>
 }
 
 export const createStory = ({
@@ -13,6 +14,7 @@ export const createStory = ({
   content,
   excerpt,
   published = false,
+  tags,
 }: createStoryProps) => {
   return fetch('/api/stories', {
     method: 'POST',
@@ -25,6 +27,7 @@ export const createStory = ({
       content,
       excerpt,
       published,
+      tags,
     }),
   }).then((res) => res.json())
 }
@@ -34,6 +37,7 @@ type updateStoryDataType = {
   content?: string
   excerpt?: string
   published?: boolean
+  tags?: Array<string>
 }
 
 export const updateStory = (

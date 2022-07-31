@@ -11,7 +11,9 @@ type useStoryParams = {
 type StatusType = 'idle' | 'loading' | 'success' | 'failed'
 
 const useStory = ({ identifier }: useStoryParams) => {
-  const { data, error, mutate } = useSWR(`/api/stories/${identifier}`)
+  const { data, error, mutate } = useSWR(() =>
+    identifier ? `/api/stories/${identifier}` : undefined
+  )
   const story = data ? (data.story as StoryDetailsType) : null
 
   let status: StatusType = 'idle'

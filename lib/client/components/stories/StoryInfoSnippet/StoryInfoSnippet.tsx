@@ -24,10 +24,10 @@ const StoryInfoSnippet = ({ story }: StoryInfoSnippetProps) => {
   return (
     <Box>
       <Group position="left" mb="md">
-        {['#mental-health', '#self-help'].map((tag) => (
-          <Link key={tag} href={tag} passHref {...prefetch}>
+        {story.tags.map((tag) => (
+          <Link key={tag} href={`#${tag}`} passHref {...prefetch}>
             <Badge sx={{ cursor: 'pointer' }} component="a" color="indigo">
-              {tag}
+              #{tag}
             </Badge>
           </Link>
         ))}

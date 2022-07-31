@@ -1,6 +1,6 @@
-import email from '@sendgrid/mail'
+import mailer from '@sendgrid/mail'
 
-email.setApiKey(process.env.SENDGRID_API_KEY ?? '')
+mailer.setApiKey(process.env.SENDGRID_API_KEY ?? '')
 
 const msg = {
   to: 'test@example.com',
@@ -10,4 +10,4 @@ const msg = {
   html: '<strong>and easy to do anywhere, even with Node.js</strong>',
 }
 
-export default email
+export default mailer

@@ -7,7 +7,8 @@ import { ObjectId } from 'mongodb'
 import { serialize } from 'cookie'
 import { generateAccessToken, verifyAuth } from '../utils/auth'
 import { ACCESS_TOKEN } from '../utils/constants'
-
+import mailer from '../services/sendgrid/mailer'
+import { getEmailVerificationMsg } from '../services/sendgrid/msgTemplates'
 export const protectAccess =
   (cb: methodHandler): methodHandler =>
   async (req, res) => {
@@ -126,6 +127,8 @@ export const signup: methodHandler = async (req, res) => {
       createdAt: new Date(),
     })
 
+    await mailer.send(getEmailVerificationMsg(email, OTP))
+
     res.status(201).json({
       status: 'success',
       OTP,
@@ -190,17 +193,26 @@ export const requestEmailVerificationToken: methodHandler = async (
 
   const hashedToken = await bcrypt.hash(OTP, 10)
 
-  await emailVerificationTokenCollection.insertOne({
-    token: hashedToken,
-    userId: user._id,
-    createdAt: new Date(),
-  })
+  try {
+    await emailVerificationTokenCollection.insertOne({
+      token: hashedToken,
+      userId: user._id,
+      createdAt: new Date(),
+    })
 
-  res.status(201).json({
-    status: 'success',
-    message: `An OTP with 6 digits long has been sent to your email address ${user.email}. It will be expired after 3 minutes.`,
-    OTP,
-  })
+    await mailer.send(getEmailVerificationMsg(user.email, OTP))
+
+    res.status(201).json({
+      status: 'success',
+      message: `An OTP with 6 digits long has been sent to your email address ${user.email}. It will be expired after 3 minutes.`,
+      OTP,
+    })
+  } catch (error: any) {
+    res.status(500).json({
+      error: error,
+      message: error.message,
+    })
+  }
 }
 
 export const verifyEmailAddress: methodHandler = async (req, res) => {

@@ -1,36 +1,14 @@
 import {
-  ActionIcon,
   AppShell,
   Aside,
   Avatar,
-  Blockquote,
-  Group,
   Stack,
   Text,
-  useMantineTheme,
-  NavLink,
-  Box,
-  ThemeIcon,
   Button,
-  Input,
   CopyButton,
   Tooltip,
 } from '@mantine/core'
-import {
-  Check,
-  Copy,
-  DiscordLogo,
-  Envelope,
-  FacebookLogo,
-  GithubLogo,
-  LinkedinLogo,
-  Quotes,
-  RedditLogo,
-  TwitchLogo,
-  UserPlus,
-  WhatsappLogo,
-  YoutubeLogo,
-} from 'phosphor-react'
+import { Check, Copy, UserPlus } from 'phosphor-react'
 import { ReactElement } from 'react'
 import { UserType } from '../../../../server/services/mongodb/queries'
 import Navbar from './Navbar'
@@ -43,7 +21,7 @@ const MainLayout = ({ children, user }: MainLayoutProps) => {
   const asideProps = user
     ? {
         aside: (
-          <Aside width={{ base: 300 }} sx={{ border: 'none' }} p="lg">
+          <Aside width={{ base: 300 }} pt="lg">
             <Aside.Section>
               <Stack align="center">
                 <Avatar
@@ -77,7 +55,7 @@ const MainLayout = ({ children, user }: MainLayoutProps) => {
                       value={user.email}
                       leftIcon={copied ? <Check /> : <Copy />}
                     >
-                      tuanphanthe@gmail.com tuanphanthe@gmail.com
+                      {user.email}
                     </Button>
                   </Tooltip>
                 )}

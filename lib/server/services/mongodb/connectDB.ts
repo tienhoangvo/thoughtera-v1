@@ -10,7 +10,7 @@ const connectDB = async () => {
 
   console.log('--DB: successfully connected!')
 
-  const db = client.db('thoughtera')
+  const db = client.db('thoughtera-v1')
 
   return db
 }
