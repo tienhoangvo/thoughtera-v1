@@ -47,7 +47,7 @@ const StoryForm = ({ story, onSave }: StoryFormProps) => {
 
     if (field === 'content') return '<p><br></p>'
 
-    if (field === 'tags') return [tagsData.slice(0, 2)]
+    if (field === 'tags') return []
 
     return ''
   }
