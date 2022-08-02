@@ -6,12 +6,13 @@ import {
 } from '@mantine/core'
 import { ReactElement, useState } from 'react'
 import Head from 'next/head'
-import type { NextPage } from 'next'
+import type { GetServerSideProps, NextPage } from 'next'
 import MainLayout from '../lib/client/components/layouts/MainLayout'
 import { NotificationsProvider } from '@mantine/notifications'
 import { SWRConfig } from 'swr'
 import { ModalsProvider } from '@mantine/modals'
 import fetcher from '../lib/client/services/fetcher'
+import { useLocalStorage } from '@mantine/hooks'
 // import RouterTransition from '../lib/client/components/loaders/RouterTransition'
 
 export type NextPageWithLayout = NextPage & {
@@ -28,12 +29,16 @@ const getDefaultLayout = (page: ReactElement) => {
 
 function MyApp({ Component, pageProps }: MyAppProps) {
   const getLayout = Component.getLayout ?? getDefaultLayout
-  const [colorScheme, setColorScheme] = useState<ColorScheme>('light')
+  const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({
+    key: 'color-scheme',
+    defaultValue: 'light',
+    getInitialValueInEffect: true,
+  })
 
   const toggleColorScheme = () => {
-    const nextColorScheme = colorScheme === 'dark' ? 'light' : 'dark'
-    setColorScheme(nextColorScheme)
+    setColorScheme((current) => (current === 'dark' ? 'light' : 'dark'))
   }
+
   return (
     <>
       <Head>
@@ -77,6 +82,14 @@ function MyApp({ Component, pageProps }: MyAppProps) {
       </ColorSchemeProvider>
     </>
   )
+}
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  return {
+    props: {
+      key: '',
+    },
+  }
 }
 
 export default MyApp
