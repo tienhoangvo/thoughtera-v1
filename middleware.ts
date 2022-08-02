@@ -1,4 +1,4 @@
-import { NextRequest, userAgent } from 'next/server'
+import { NextRequest } from 'next/server'
 import { NextResponse as res } from 'next/server'
 import { verifyAuth } from './lib/server/utils/auth'
 import { ACCESS_TOKEN } from './lib/server/utils/constants'
