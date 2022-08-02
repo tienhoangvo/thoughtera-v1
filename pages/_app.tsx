@@ -84,12 +84,4 @@ function MyApp({ Component, pageProps }: MyAppProps) {
   )
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  return {
-    props: {
-      key: '',
-    },
-  }
-}
-
 export default MyApp
