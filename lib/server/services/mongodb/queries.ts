@@ -38,8 +38,9 @@ export type UserType = {
 type ListStoriesQueryParams = {
   page: number
   filter?: {
-    username?: string
+    userId?: string
     published: boolean
+    username?: string
   }
 }
 export const listStoriesByPage = async ({
@@ -53,13 +54,20 @@ export const listStoriesByPage = async ({
   let FILTER = {}
 
   if (filter) {
+    FILTER = {
+      published: filter.published,
+    }
+
+    if (filter.userId) {
+      FILTER = {
+        userId: { $not: { $eq: filter.userId } },
+        published: filter.published,
+      }
+    }
+
     if (filter.username) {
       FILTER = {
         'userData.username': filter.username,
-        published: filter.published,
-      }
-    } else {
-      FILTER = {
         published: filter.published,
       }
     }

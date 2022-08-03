@@ -1,12 +1,16 @@
 import { Button, Center, Container, LoadingOverlay } from '@mantine/core'
-import type { GetStaticProps, NextPage } from 'next'
+import type { GetServerSideProps, GetStaticProps, NextPage } from 'next'
 import { ArrowDown } from 'phosphor-react'
 import { SWRConfig } from 'swr'
 import StoryList from '../lib/client/components/stories/StoryList/StoryList'
 import StoryListItemAuthor from '../lib/client/components/stories/StoryListItemAuthor'
 import useStories from '../lib/client/hooks/useData/useStories'
 import { ListStoryType } from '../lib/client/services/stories'
-import { listStoriesByPage } from '../lib/server/services/mongodb/queries'
+import {
+  listStoriesByPage,
+  StoryListType,
+} from '../lib/server/services/mongodb/queries'
+import { verifyAuth } from '../lib/server/utils/auth'
 
 const Home = () => {
   const { stories, nextPage, status } = useStories({})
@@ -45,11 +49,22 @@ const HomePage: NextPage = (props: { fallback?: ListStoryType }) => {
   )
 }
 
-export const getStaticProps: GetStaticProps = async (context) => {
-  const stories = await listStoriesByPage({
-    page: 1,
-    filter: { published: true },
-  })
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { accessToken } = context.req.cookies
+  let stories: StoryListType
+  if (!accessToken) {
+    stories = await listStoriesByPage({
+      page: 1,
+      filter: { published: true },
+    })
+  } else {
+    const payload = await verifyAuth(accessToken)
+
+    stories = await listStoriesByPage({
+      page: 1,
+      filter: { published: true, userId: payload._id },
+    })
+  }
 
   return {
     props: {
@@ -57,8 +72,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
         '/api/stories?page=1': JSON.parse(JSON.stringify(stories)),
       },
     },
-    // revalidate new data 60 seconds after user request
-    revalidate: 60,
   }
 }
 
