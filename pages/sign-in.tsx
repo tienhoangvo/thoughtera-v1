@@ -1,33 +1,45 @@
-import {
-  Button,
-  Card,
-  Group,
-  LoadingOverlay,
-  Text,
-  TextInput,
-} from '@mantine/core'
+import { Button, Group, LoadingOverlay, TextInput } from '@mantine/core'
+import { useForm, zodResolver } from '@mantine/form'
 import { showNotification } from '@mantine/notifications'
 import Link from 'next/link'
-import { FormEvent, useState } from 'react'
+import { z } from 'zod'
+import { useState } from 'react'
+
+import AuthLayout from '../lib/client/components/layouts/AuthLayout'
 import VerifyEmailModal from '../lib/client/components/modals/VerifyEmailModal'
 import { signIn } from '../lib/client/services/auth'
+import { NextPageWithLayout } from './_app'
 
 type UserData = {
   userId: string
   userEmail: string
 } | null
-const SignInPage = () => {
+
+const SignInSchema = z.object({
+  username: z
+    .string({ required_error: 'Username is required' })
+    .min(5, { message: 'Username should have at least 5 letters' }),
+
+  password: z.string().trim().min(5, 'Username should have at least 5 letters'),
+})
+
+const SignInPage: NextPageWithLayout = () => {
   const [status, setStatus] = useState('idle')
   const [userData, setUserData] = useState<UserData>(null)
-  const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const username = formData.get('username')
-    const password = formData.get('password')
-    setStatus('signing-up')
+  const form = useForm({
+    validate: zodResolver(SignInSchema),
+    initialValues: {
+      username: '',
+      password: '',
+    },
+    validateInputOnChange: true,
+  })
+
+  const handleSubmit = (values: typeof form.values) => {
+    console.log(values)
+    setStatus('signing-in')
     signIn({
-      username: username as string,
-      password: password as string,
+      ...values,
     }).then((res) => {
       if (res.status === 'success') {
         if (typeof window !== 'undefined') {
@@ -58,51 +70,54 @@ const SignInPage = () => {
     setUserData(null)
   }
 
+  console.log('form.errors', form.errors)
+
   return (
-    <Card sx={{ width: '400px', marginInline: 'auto' }} p="lg" withBorder>
-      <LoadingOverlay visible={status === 'signing-up'} />
+    <>
+      <LoadingOverlay visible={status === 'signing-in'} />
       <VerifyEmailModal
         opened={!!userData}
         userEmail={userData?.userEmail}
         userId={userData?.userId}
         onClose={handleVerifyEmailClose}
       />
-      <Text
-        component="h1"
-        align="center"
-        mb="lg"
-        sx={{ fontFamily: 'inherit', fontSize: '25px' }}
-      >
-        Sign in
-      </Text>
-      <form onSubmit={handleFormSubmit}>
+
+      <form onSubmit={form.onSubmit(handleSubmit)}>
         <TextInput
           required
           label="Username"
           mb="md"
-          name="username"
           type="text"
           variant="filled"
+          {...form.getInputProps('username')}
         />
         <TextInput
           required
           label="Password"
           mb="md"
-          name="password"
           type="password"
           variant="filled"
+          {...form.getInputProps('password')}
         />
         <Group position="apart">
           <Link href="/sign-up" passHref>
             <Button variant="subtle">{`I don't have an account`}</Button>
           </Link>
-          <Button type="submit" variant="light">
+          <Button
+            type="submit"
+            variant="light"
+            disabled={Object.keys(form.errors).length > 0}
+          >
             Sign in
           </Button>
         </Group>
       </form>
-    </Card>
+    </>
   )
+}
+
+SignInPage.getLayout = (page) => {
+  return <AuthLayout title="Sign in">{page}</AuthLayout>
 }
 
 export default SignInPage

@@ -1,36 +1,42 @@
-import {
-  Button,
-  Card,
-  Group,
-  LoadingOverlay,
-  Text,
-  TextInput,
-} from '@mantine/core'
+import { Button, Group, LoadingOverlay, TextInput } from '@mantine/core'
+import { useForm, zodResolver } from '@mantine/form'
 import { showNotification } from '@mantine/notifications'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { FormEvent, useState } from 'react'
+import { useState } from 'react'
+import { z } from 'zod'
+import AuthLayout from '../lib/client/components/layouts/AuthLayout'
 import { signUp } from '../lib/client/services/auth'
+import { NextPageWithLayout } from './_app'
 
-const SignUpPage = () => {
+const SignUpSchema = z.object({
+  username: z
+    .string({ required_error: 'Username is required' })
+    .min(5, { message: 'Username should have at least 5 letters' }),
+  password: z.string().trim().min(5, 'Username should have at least 5 letters'),
+  name: z.string().min(1),
+  email: z.string().email(),
+})
+
+const SignUpPage: NextPageWithLayout = () => {
   const [status, setStatus] = useState<'idle' | 'signing-up'>('idle')
 
   const router = useRouter()
 
-  const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const formData = new FormData(event.currentTarget)
-    const username = formData.get('username')
-    const password = formData.get('password')
-    const name = formData.get('name')
-    const email = formData.get('email')
+  const form = useForm({
+    validate: zodResolver(SignUpSchema),
+    initialValues: {
+      username: '',
+      password: '',
+      name: '',
+      email: '',
+    },
+    validateInputOnChange: true,
+  })
+
+  const handleFormSubmit = (values: typeof form.values) => {
     setStatus('signing-up')
-    signUp({
-      name: name as string,
-      email: email as string,
-      username: username as string,
-      password: password as string,
-    }).then((res) => {
+    signUp(values).then((res) => {
       if (res.status === 'success') router.push('/sign-in')
 
       if (res.status === 'failed') {
@@ -45,26 +51,18 @@ const SignUpPage = () => {
   }
 
   return (
-    <Card sx={{ width: '400px', marginInline: 'auto' }} withBorder p="lg">
+    <>
       <LoadingOverlay visible={status === 'signing-up'} />
-      <Text
-        component="h1"
-        align="center"
-        mb="lg"
-        sx={{ fontFamily: 'inherit', fontSize: '25px' }}
-      >
-        Sign up
-      </Text>
-      <form onSubmit={handleFormSubmit}>
+      <form onSubmit={form.onSubmit(handleFormSubmit)}>
         <TextInput
           required
           label="Name"
           size="sm"
           mb="md"
           type="text"
-          name="name"
           autoComplete="off"
           variant="filled"
+          {...form.getInputProps('name')}
         />
         <TextInput
           required
@@ -72,9 +70,9 @@ const SignUpPage = () => {
           size="sm"
           mb="md"
           type="email"
-          name="email"
           autoComplete="off"
           variant="filled"
+          {...form.getInputProps('email')}
         />
         <TextInput
           required
@@ -82,9 +80,9 @@ const SignUpPage = () => {
           size="sm"
           mb="md"
           type="text"
-          name="username"
           autoComplete="off"
           variant="filled"
+          {...form.getInputProps('username')}
         />
         <TextInput
           required
@@ -92,9 +90,9 @@ const SignUpPage = () => {
           size="sm"
           mb="md"
           type="password"
-          name="password"
           autoComplete="off"
           variant="filled"
+          {...form.getInputProps('password')}
         />
         <Group position="apart">
           <Link href="/sign-in" passHref>
@@ -102,13 +100,21 @@ const SignUpPage = () => {
               I have an account
             </Button>
           </Link>
-          <Button type="submit" variant="light">
+          <Button
+            type="submit"
+            variant="light"
+            disabled={Object.keys(form.errors).length > 0}
+          >
             Sign up
           </Button>
         </Group>
       </form>
-    </Card>
+    </>
   )
+}
+
+SignUpPage.getLayout = (page) => {
+  return <AuthLayout title="Sign up">{page}</AuthLayout>
 }
 
 export default SignUpPage

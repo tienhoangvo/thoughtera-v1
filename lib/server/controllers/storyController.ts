@@ -1,14 +1,13 @@
-import { Db, ObjectId } from 'mongodb'
-import StoryType from '../collectionTypes/StoryType'
-import UserType from '../collectionTypes/UserType'
+import { ObjectId } from 'mongodb'
+import { nanoid } from 'nanoid'
+import slugify from 'slugify'
+
 import type { methodHandler } from '../routeHandler'
 import getCollection from '../services/mongodb/getCollection'
-import slugify from 'slugify'
 import connectDB from '../services/mongodb/connectDB'
-import { listStoriesByPage } from '../services/mongodb/queries'
+import { listStoriesByPage, StoryListType } from '../services/mongodb/queries'
 import { STORY_LIMIT } from '../services/mongodb/constants'
-import { UserSession } from '../utils/auth'
-import { nanoid } from 'nanoid'
+import { UserSession, verifyAuth } from '../utils/auth'
 
 type ListStoriesQuery = {
   username?: string
@@ -28,7 +27,23 @@ export const listStories: methodHandler = async (req, res) => {
         published: true,
       }
 
-  const stories = await listStoriesByPage({ page: PAGE, filter })
+  let stories: StoryListType = []
+  const { accessToken } = req.cookies
+  if (accessToken) {
+    const payload = await verifyAuth(accessToken)
+
+    if (payload) {
+      stories = await listStoriesByPage({
+        page: PAGE,
+        filter: { ...filter, userId: payload._id },
+      })
+    }
+  } else {
+    stories = await listStoriesByPage({
+      page: PAGE,
+      filter: filter,
+    })
+  }
 
   // res.setHeader('Cache-Control', 'max-age=0, s-maxage=86400')
   res.status(200).json({
