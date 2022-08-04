@@ -133,10 +133,10 @@ export const addStory: methodHandler = async (req, res) => {
       _id: insertedId,
     })
 
-    if (newStory?.published) {
-      res.revalidate(`/@${newStory.userData.username}`)
-      res.revalidate(`/@${newStory.userData.username}/${newStory.slug}`)
-    }
+    // if (newStory?.published) {
+    //   res.revalidate(`/@${newStory.userData.username}`)
+    //   res.revalidate(`/@${newStory.userData.username}/${newStory.slug}`)
+    // }
 
     res.status(201).json({
       status: 'success',
@@ -194,7 +194,6 @@ export const getStory: methodHandler = async (req, res) => {
 
 export const updateStory: methodHandler = async (req, res) => {
   const { id } = req.query
-  console.log(req.query)
 
   const {
     session,
@@ -227,7 +226,6 @@ export const updateStory: methodHandler = async (req, res) => {
     const userId = session._id
     const _id = new ObjectId(id as string)
 
-    console.log({ userId, _id })
     const data = await storyCollection.findOneAndUpdate(
       {
         _id,
@@ -241,10 +239,10 @@ export const updateStory: methodHandler = async (req, res) => {
       }
     )
 
-    if (data.value?.published) {
-      res.revalidate(`/@${data.value.userData.username}`)
-      res.revalidate(`/@${data.value.userData.username}/${data.value.slug}`)
-    }
+    // if (data.value?.published) {
+    //   res.revalidate(`/@${data.value.userData.username}`)
+    //   res.revalidate(`/@${data.value.userData.username}/${data.value.slug}`)
+    // }
 
     res.status(200).json({
       status: 'success',
@@ -275,10 +273,10 @@ export const deleteStory: methodHandler = async (req, res) => {
       throw new Error('No story found')
     }
 
-    if (data.value.published) {
-      res.revalidate(`/@${session.username}`)
-      res.revalidate(`/@${session.username}/${data.value.slug}`)
-    }
+    // if (data.value.published) {
+    //   res.revalidate(`/@${session.username}`)
+    //   res.revalidate(`/@${session.username}/${data.value.slug}`)
+    // }
 
     res.status(200).json({
       status: 'success',

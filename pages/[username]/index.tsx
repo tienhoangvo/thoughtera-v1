@@ -78,7 +78,6 @@ export const getStaticProps: GetStaticProps = async (context) => {
 export const getStaticPaths: GetStaticPaths = async (context) => {
   const db = await connectDB()
 
-  console.log('getStaticPaths context', context)
   const userCollection = getCollection(db)('users')
 
   const users = await userCollection
@@ -91,8 +90,6 @@ export const getStaticPaths: GetStaticPaths = async (context) => {
       }
     )
     .toArray()
-
-  console.log(users)
 
   const usernamePaths = users.map((user) => {
     return {

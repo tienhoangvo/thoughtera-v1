@@ -44,8 +44,6 @@ export const signin: methodHandler = async (req, res) => {
     username,
   })
 
-  console.log(user)
-
   if (!user) {
     return res.status(401).json({
       status: 'failed',
@@ -138,8 +136,6 @@ export const signup: methodHandler = async (req, res) => {
       },
     })
   } catch (error: any) {
-    console.log(error)
-
     if (error.code === 11000) {
       error.message = `${Object.keys(error.keyValue)[0]}: ${
         Object.values(error.keyValue)[0]

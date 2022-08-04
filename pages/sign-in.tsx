@@ -36,7 +36,6 @@ const SignInPage: NextPageWithLayout = () => {
   })
 
   const handleSubmit = (values: typeof form.values) => {
-    console.log(values)
     setStatus('signing-in')
     signIn({
       ...values,
@@ -69,8 +68,6 @@ const SignInPage: NextPageWithLayout = () => {
   const handleVerifyEmailClose = () => {
     setUserData(null)
   }
-
-  console.log('form.errors', form.errors)
 
   return (
     <>

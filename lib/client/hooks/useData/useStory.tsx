@@ -30,7 +30,6 @@ const useStory = ({ identifier }: useStoryParams) => {
     status = 'failed'
   }
 
-  console.log(data)
   return {
     story,
     error,

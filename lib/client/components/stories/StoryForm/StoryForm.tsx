@@ -89,7 +89,7 @@ const StoryForm = ({ story, onSave }: StoryFormProps) => {
 
   const handleTagsChange = (value: [string]) => {
     setTags(value)
-    console.log('value tags', value)
+
     storySubmitDataRef.current.tags = value
   }
 

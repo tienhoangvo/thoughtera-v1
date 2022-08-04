@@ -34,7 +34,6 @@ const MainLinks = () => {
     }
 
     if (href !== '/') {
-      console.log(href, pathname)
       selected = pathname.startsWith(href)
     }
     return selected

@@ -7,7 +7,7 @@ import UserMenu from '../UserMenu'
 
 const Navbar = () => {
   const { user } = useCurrentUser()
-  console.log('😎', user)
+
   return (
     <MantineNavbar
       width={{

@@ -87,8 +87,6 @@ export const getStaticPaths: GetStaticPaths = async (context) => {
     }
   })
 
-  console.log('storyPaths', storyPaths)
-
   return {
     paths: storyPaths,
     fallback: true,
